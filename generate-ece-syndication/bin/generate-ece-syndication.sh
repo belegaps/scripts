@@ -8,5 +8,18 @@ while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-XALAN="java -cp ~/Development/Java/xalan-j_2_7_1/xalan.jar org.apache.xalan.xslt.Process"
+if [ -z "$2" ]; then
+	echo "Usage: `basename $0` <content-type-file> <content-type>..." 1>&2
+	exit 1
+fi
+
+CONTENT_TYPE_FILE=$1
+shift 1
+
+while [ -n "$1" ]; do
+	CONTENT_TYPES="${CONTENT_TYPES:+$CONTENT_TYPES,}$1"
+	shift 1
+done
+
+xalan -in $CONTENT_TYPE_FILE -xsl $DIR/../lib/generate-ece-syndication.xsl -param content-types "$CONTENT_TYPES"
 
