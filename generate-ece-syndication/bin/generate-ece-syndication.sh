@@ -8,6 +8,8 @@ while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
+TIMESTAMP=`date "+%Y%m%d%H%M%S"`
+
 if [ -z "$2" ]; then
 	echo "Usage: `basename $0` <content-type-file> <content-type>..." 1>&2
 	exit 1
@@ -21,5 +23,5 @@ while [ -n "$1" ]; do
 	shift 1
 done
 
-xalan -in $CONTENT_TYPE_FILE -xsl $DIR/../lib/generate-ece-syndication.xsl -param content-types "$CONTENT_TYPES"
+xalan -in $CONTENT_TYPE_FILE -xsl $DIR/../lib/generate-ece-syndication.xsl -param content-types "$CONTENT_TYPES" -param timestamp "$TIMESTAMP"
 

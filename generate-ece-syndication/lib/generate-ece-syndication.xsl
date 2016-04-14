@@ -8,6 +8,7 @@
 
 	<xsl:output encoding="UTF-8" indent="yes" method="xml" />
 	<xsl:param name="content-types"/>
+	<xsl:param name="timestamp" select="''"/>
 
 	<xsl:template match="/">
 		<escenic version="2.0">
@@ -19,6 +20,7 @@
 
 	<xsl:template name="generate-content">
 		<xsl:param name="content-types"/>
+		<xsl:param name="index" select="1"/>
 
 		<xsl:if test="$content-types != ''">
 			<xsl:variable name="content-type">
@@ -32,18 +34,23 @@
 				</xsl:choose>
 			</xsl:variable>
 
-			<xsl:apply-templates select="/ct:content-types/ct:content-type[@name=$content-type]"/>
+			<xsl:apply-templates select="/ct:content-types/ct:content-type[@name=$content-type]">
+				<xsl:with-param name="index" select="$index"/>
+			</xsl:apply-templates>
 
 			<xsl:if test="contains($content-types, ',')">
 				<xsl:call-template name="generate-content">
 					<xsl:with-param name="content-types" select="substring-after($content-types, ',')" />
+					<xsl:with-param name="index" select="$index + 1"/>
 				</xsl:call-template>
 			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="ct:content-type">
-		<content type="{@name}" state="published">
+		<xsl:param name="index"/>
+
+		<content type="{@name}" state="published" source="generated" sourceid="{concat($timestamp,'-',$index)}">
 			<section-ref unique-name="ece_incoming" home-section="true"/>
 
 			<xsl:apply-templates select="ct:panel"/>
